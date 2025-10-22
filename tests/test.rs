@@ -180,12 +180,12 @@ fn petstore_discriminated() {
                                             ..Default::default()
                                         },
                                         schema_kind: SchemaKind::Type(Type::String(StringType {
-                                            enumeration: vec![
+                                            enumeration: Some(vec![
                                                 Some("clueless".to_owned()),
                                                 Some("lazy".to_owned()),
                                                 Some("adventurous".to_owned()),
                                                 Some("aggressive".to_owned()),
-                                            ],
+                                            ]),
                                             ..Default::default()
                                         })),
                                     }),

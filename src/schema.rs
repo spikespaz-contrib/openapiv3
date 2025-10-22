@@ -539,12 +539,12 @@ fn none_or_int(value: &Option<serde_json::Number>) -> bool {
 fn enumerated_values_transform<T, F>(
     enumeration: Option<Vec<serde_json::Value>>,
     transform: F,
-) -> Vec<Option<T>>
+) -> Option<Vec<Option<T>>>
 where
     F: Fn(&serde_json::Value) -> Option<T>,
 {
-    match enumeration {
-        Some(values) => values
+    enumeration.map(|values| {
+        values
             .iter()
             .map(|v| {
                 if v.is_null() {
@@ -553,9 +553,8 @@ where
                     Some(transform(v).unwrap())
                 }
             })
-            .collect::<Vec<_>>(),
-        None => Default::default(),
-    }
+            .collect::<Vec<_>>()
+    })
 }
 
 fn enumerated_values_valid<F>(enumeration: &Option<Vec<serde_json::Value>>, check: F) -> bool
@@ -648,8 +647,8 @@ pub struct StringType {
     pub format: VariantOrUnknownOrEmpty<StringFormat>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pattern: Option<String>,
-    #[serde(rename = "enum", default, skip_serializing_if = "Vec::is_empty")]
-    pub enumeration: Vec<Option<String>>,
+    #[serde(rename = "enum", default, skip_serializing_if = "Option::is_none")]
+    pub enumeration: Option<Vec<Option<String>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub min_length: Option<usize>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -671,8 +670,8 @@ pub struct NumberType {
     pub minimum: Option<f64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maximum: Option<f64>,
-    #[serde(rename = "enum", default, skip_serializing_if = "Vec::is_empty")]
-    pub enumeration: Vec<Option<f64>>,
+    #[serde(rename = "enum", default, skip_serializing_if = "Option::is_none")]
+    pub enumeration: Option<Vec<Option<f64>>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
@@ -690,8 +689,8 @@ pub struct IntegerType {
     pub minimum: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maximum: Option<i64>,
-    #[serde(rename = "enum", default, skip_serializing_if = "Vec::is_empty")]
-    pub enumeration: Vec<Option<i64>>,
+    #[serde(rename = "enum", default, skip_serializing_if = "Option::is_none")]
+    pub enumeration: Option<Vec<Option<i64>>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
@@ -725,8 +724,8 @@ pub struct ArrayType {
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct BooleanType {
-    #[serde(rename = "enum", default, skip_serializing_if = "Vec::is_empty")]
-    pub enumeration: Vec<Option<bool>>,
+    #[serde(rename = "enum", default, skip_serializing_if = "Option::is_none")]
+    pub enumeration: Option<Vec<Option<bool>>>,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
@@ -914,7 +913,7 @@ mod tests {
                 min_length: None,
                 max_length: None,
             })) => {
-                assert_eq!(enumeration, vec![None, Some("howdy".to_string())]);
+                assert_eq!(enumeration, Some(vec![None, Some("howdy".to_string())]));
             }
             _ => panic!("incorrect kind {:#?}", schema),
         }
