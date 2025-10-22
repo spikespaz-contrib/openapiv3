@@ -245,7 +245,7 @@ impl<'de> Deserialize<'de> for SchemaKind {
             {
                 Ok(Self::Type(Type::Integer(IntegerType {
                     format: format.into(),
-                    multiple_of: multiple_of.map(|v| v.as_i64().unwrap()),
+                    multiple_of: multiple_of.map(|v| v.as_u64().unwrap()),
                     exclusive_minimum: exclusive_minimum.unwrap_or_default(),
                     exclusive_maximum: exclusive_maximum.unwrap_or_default(),
                     minimum: minimum.map(|v| v.as_i64().unwrap()),
@@ -681,7 +681,7 @@ pub struct IntegerType {
     #[serde(default, skip_serializing_if = "VariantOrUnknownOrEmpty::is_empty")]
     pub format: VariantOrUnknownOrEmpty<IntegerFormat>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub multiple_of: Option<i64>,
+    pub multiple_of: Option<u64>,
     #[serde(default, skip_serializing_if = "is_false")]
     pub exclusive_minimum: bool,
     #[serde(default, skip_serializing_if = "is_false")]
