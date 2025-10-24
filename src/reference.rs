@@ -111,6 +111,16 @@ impl<T> ReferenceOr<T> {
             ReferenceOr::Item(i) => Some(i),
         }
     }
+
+    /// Returns a reference to the `reference` inside this [`ReferenceOr`], if it exists.
+    ///
+    /// If this is not a `ReferenceOr::Reference`, the return value will be `None`.
+    pub fn as_reference(&self) -> Option<&str> {
+        match self {
+            ReferenceOr::Reference { reference } => Some(reference),
+            ReferenceOr::Item(_) => None,
+        }
+    }
 }
 
 impl<T> ReferenceOr<Box<T>> {
